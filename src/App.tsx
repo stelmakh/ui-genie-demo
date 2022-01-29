@@ -1,26 +1,38 @@
-import React from 'react';
+import { ChangeEvent, useCallback, useState } from 'react';
 import './App.css';
-import {ComponentsMap, UIGenieView, UIGenieFields, UIGenieProps, UIGenieItems} from 'ui-genie'
+import {UIGenieView} from 'ui-genie'
 import {personsCollectionSchema, multiplePersons} from './mocks/person'
+import { applyOperation, Operation } from 'fast-json-patch';
+import { createViewMap, createFormMap, ValueGetter, createTableMap } from './maps';
 
 function App() {
-  const componentsMap = new ComponentsMap('item-view')
+  const [data, setData] = useState(multiplePersons);
 
-  componentsMap.addItem({name: 'collection', type: 'array', component: (props: UIGenieProps) => (
-    <UIGenieItems {...props}/>
-  )})
-  componentsMap.addItem({name: 'fields', type: 'object', component: (props: UIGenieProps) => (
-    <fieldset>
-      <UIGenieFields {...props}/>
-    </fieldset>
-  )})
-  componentsMap.addItem({name: 'stringField', type: 'string', component: ({data}: UIGenieProps) => (<div>{data}</div>)})
-  componentsMap.addItem({name: 'numberField', type: 'integer', component: ({data}: UIGenieProps) => (<div>{data}</div>)})
+  const createOnChangeHandler = useCallback((pointer: string, getValue: ValueGetter<any>) => (e: ChangeEvent<any>) => {
+    const value = e.currentTarget?.value;
 
+    const operation =
+      {
+        op: 'replace',
+        path: pointer,
+        value: getValue(value)
+      } as Operation
+
+    setData(applyOperation(data, operation, false, false).newDocument)
+
+  }, [data])
+
+  const viewMap = createViewMap();
+  const tableMap = createTableMap();
+  const formMap = createFormMap(createOnChangeHandler);
 
   return (
     <div className="App">
-      <UIGenieView schema={personsCollectionSchema} data={multiplePersons} componentsMap={componentsMap}/>
+      <UIGenieView schema={personsCollectionSchema} data={data} componentsMap={tableMap}/>
+      <br/>
+      <UIGenieView schema={personsCollectionSchema} data={data} componentsMap={viewMap}/>
+      <br/>
+      <UIGenieView schema={personsCollectionSchema} data={data} componentsMap={formMap}/>
     </div>
   );
 }
