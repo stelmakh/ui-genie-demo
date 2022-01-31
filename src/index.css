@@ -12,6 +12,38 @@ code {
     monospace;
 }
 
+.container {
+  display: flex;
+  flex-direction: column;
+  padding: 8px;
+}
+
+.content {
+  padding: 8px 0;
+  width: 100%;
+}
+
+.table-wrapper {
+  padding: 8px 16px;
+}
+
+.item {
+  border: 1px solid darkgray;
+  border-radius: 4px;
+  margin: 8px;
+  padding: 8px;
+  display: flex;
+}
+
+.item-name {
+  margin: 0 2px;
+}
+
+.item-age {
+  vertical-align: middle;
+  margin-left: 8px;
+}
+
 table, th, td {
   border: 1px solid black;
 }

@@ -1,12 +1,13 @@
-import { ChangeEvent, useCallback, useState } from 'react';
+import { ChangeEvent, useCallback, useMemo, useState } from 'react';
 import './App.css';
 import {UIGenieView} from 'ui-genie'
 import {personsCollectionSchema, multiplePersons} from './mocks/person'
 import { applyOperation, Operation } from 'fast-json-patch';
-import { createViewMap, createFormMap, ValueGetter, createTableMap } from './maps';
+import { useListMap, useFormMap, ValueGetter, useTableMap } from './maps';
 
 function App() {
   const [data, setData] = useState(multiplePersons);
+  const [view, setView] = useState<'table' | 'list' | 'form'>('table')
 
   const createOnChangeHandler = useCallback((pointer: string, getValue: ValueGetter<any>) => (e: ChangeEvent<any>) => {
     const value = e.currentTarget?.value;
@@ -18,21 +19,37 @@ function App() {
         value: getValue(value)
       } as Operation
 
-    setData(applyOperation(data, operation, false, false).newDocument)
+    setData(data => applyOperation(data, operation, false, false).newDocument)
 
-  }, [data])
+  }, [])
 
-  const viewMap = createViewMap();
-  const tableMap = createTableMap();
-  const formMap = createFormMap(createOnChangeHandler);
+  const listMap = useListMap();
+  const tableMap = useTableMap();
+  const formMap = useFormMap(createOnChangeHandler);
+
+  const componentsMap = useMemo(() => {
+    switch(view) {
+      case 'list':
+        return listMap;
+      case 'form':
+        return formMap;
+      default:
+        return tableMap
+    }
+  }, [formMap, listMap, tableMap, view])
 
   return (
     <div className="App">
-      <UIGenieView schema={personsCollectionSchema} data={data} componentsMap={tableMap}/>
-      <br/>
-      <UIGenieView schema={personsCollectionSchema} data={data} componentsMap={viewMap}/>
-      <br/>
-      <UIGenieView schema={personsCollectionSchema} data={data} componentsMap={formMap}/>
+      <div className='container'>
+        <div>
+          <button onClick={() => setView('table')} disabled={view === 'table'}>table</button>
+          <button onClick={() => setView('list')} disabled={view === 'list'}>list</button>
+          <button onClick={() => setView('form')} disabled={view === 'form'}>form</button>
+        </div>
+        <div className='content'>
+          <UIGenieView schema={personsCollectionSchema} data={data} componentsMap={componentsMap}/>
+        </div>
+      </div>
     </div>
   );
 }
