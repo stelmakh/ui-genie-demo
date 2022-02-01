@@ -5,7 +5,7 @@ export type ValueGetter<T = any> = (e: T) => any;
 
 export const useListMap = () => {
   return useMemo(() => {
-    const componentsMap = new ComponentsMap('item-view')
+    const componentsMap = new ComponentsMap('items-list')
 
     componentsMap.addItem({
       name: 'collection',
@@ -93,7 +93,7 @@ export const useFormMap = (
   createOnChangeHandler: (pointer: string, getValue: ValueGetter<any>) => (e: ChangeEvent) => void
 ) => {
   return useMemo(() => {
-    const componentsMap = new ComponentsMap('item-form')
+    const componentsMap = new ComponentsMap('items-form')
 
     componentsMap.addItem({
       name: 'collection',

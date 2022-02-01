@@ -47,7 +47,11 @@ function App() {
           <button onClick={() => setView('form')} disabled={view === 'form'}>form</button>
         </div>
         <div className='content'>
-          <UIGenieView schema={personsCollectionSchema} data={data} componentsMap={componentsMap}/>
+          <UIGenieView
+            schema={personsCollectionSchema}
+            data={data}
+            componentsMap={componentsMap}
+          />
         </div>
       </div>
     </div>
